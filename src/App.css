@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ẩn scrollbar trên Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+/* --- Style CHUNG cho các thanh trượt (Cập nhật để dùng màu động) --- */
+/* Điều này đảm bảo tính nhất quán nếu bạn có các slider khác trong tương lai */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    /* ✅ SỬA: Dùng màu động thay vì màu tím cứng */
+    background: var(--accent-color, #9333ea); 
+    border-radius: 50%;
+    /* ✅ SỬA: Hiệu ứng "glow" cũng dùng màu động */
+    box-shadow: 0 0 8px var(--accent-color, rgba(147, 51, 234, 0.7));
+    transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+    /* ✅ SỬA: Hiệu ứng "glow" khi hover cũng dùng màu động */
+    box-shadow: 0 0 12px var(--accent-color, rgba(168, 85, 247, 0.9));
+}
+
+
+/* --- Style RIÊNG cho thanh trượt ÂM LƯỢNG thẳng đứng --- */
+.volume-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  transform: rotate(-90deg);
+  width: 100px;
+}
+
+/* --- Style cho phần RÃNH (track) --- */
+.volume-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 6px;
+  /* ✅ SỬA: Dùng màu động cho phần đã fill của rãnh */
+  /* Logic: Màu nền sẽ là màu accent cho đến vị trí --volume-percent, phần còn lại là màu xám mờ */
+  background: linear-gradient(to right, 
+    var(--accent-color, #a855f7) var(--volume-percent), 
+    rgba(255, 255, 255, 0.2) var(--volume-percent)
+  );
+}
+.volume-range::-moz-range-track {
+  height: 6px;
+  border-radius: 6px;
+  /* ✅ SỬA: Tương tự cho Firefox */
+  background: linear-gradient(to right, 
+    var(--accent-color, #a855f7) var(--volume-percent), 
+    rgba(255, 255, 255, 0.2) var(--volume-percent)
+  );
+}
+
+/* --- Style cho phần CON TRỎ (thumb) --- */
+.volume-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -5px; /* Căn giữa con trỏ */
+  
+  height: 16px;
+  width: 16px;
+  /* ✅ SỬA: Dùng màu động cho con trỏ */
+  background-color: var(--accent-color, #fff);
+  border-radius: 50%;
+  border: none;
+  /* ✅ SỬA: Hiệu ứng "glow" cho con trỏ, đồng bộ với nút Play */
+  box-shadow: 0 0 8px var(--accent-color, rgba(0,0,0,0.5));
+}
+.volume-range::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  /* ✅ SỬA: Tương tự cho Firefox */
+  background-color: var(--accent-color, #fff);
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 0 8px var(--accent-color, rgba(0,0,0,0.5));
+}

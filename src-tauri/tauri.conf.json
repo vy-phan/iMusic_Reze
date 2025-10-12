@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "i-music",
+  "version": "1.0.0",
+  "identifier": "com.dell.i-music",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "iMusic",
+        "width": 450,
+        "height": 600,
+        "resizable": false,
+        "fullscreen": false,
+        "maximized": false,
+        "decorations": true,
+        "maximizable": false,
+        "minimizable": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "*/**"
+        ]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "copyright": "Copyright © 2025 Vy Phan Dev. All rights reserved.",
+    "shortDescription": "Trình phát nhạc cá nhân, gọn nhẹ và mạnh mẽ.",
+    "longDescription": "iMusic là một trình phát nhạc được xây dựng với Tauri và React, cho phép bạn quản lý và thưởng thức thư viện nhạc cá nhân một cách dễ dàng.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
