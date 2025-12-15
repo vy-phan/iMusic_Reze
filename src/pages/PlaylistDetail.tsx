@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Edit, Music2, Pause, Play, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Edit, Home, Music2, Pause, Play, Plus, Save, Search, Trash2, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAudioPlayer } from "../contexts/AudioContext";
 import { useState, useEffect, useMemo } from "react";
@@ -102,15 +102,14 @@ const PlaylistDetail = () => {
         return songsInPlaylist.some(song => song.path === currentSong.path);
     }, [isPlaying, currentSong, songsInPlaylist]);
 
-    // ✅ ĐÃ SỬA: Hàm xử lý nút "Phát" chính
+    // Hàm xử lý nút "Phát" chính
     const handlePlayPlaylist = () => {
+        if (songsInPlaylist.length === 0) return;
+
         if (isThisPlaylistPlaying) {
-            playPause(); // Nếu đang phát playlist này -> Tạm dừng
+            playPause();
         } else {
-            // Nếu không, bắt đầu phát bài đầu tiên của playlist
-            if (songsInPlaylist.length > 0) {
-                playSong(songsInPlaylist[0], songsInPlaylist, coverImageUrl);
-            }
+            playSong(songsInPlaylist[0], songsInPlaylist, coverImageUrl);
         }
     };
 
@@ -215,15 +214,45 @@ const PlaylistDetail = () => {
             {/* Header động */}
             <div className={`sticky top-0 z-20 px-6 pt-8 pb-4 transition-all duration-300 ${isScrolled ? 'bg-[#1a0d2e]/80 backdrop-blur-lg' : 'bg-transparent'}`}>
                 <div className="relative flex items-center justify-between">
-                    <button onClick={() => navigate("/playlists")} title="Quay Lại" className="p-2 rounded-full bg-white/5 hover:bg-white/15 transition-all"><ArrowLeft size={22} className="text-purple-300" /></button>
+
+                    {/* NHÓM CÁC NÚT ĐIỀU HƯỚNG BÊN TRÁI */}
+                    <div className="flex items-center gap-3">
+                        {/* Nút Quay lại Playlist */}
+                        <button
+                            onClick={() => navigate("/playlists")}
+                            title="Quay Lại"
+                            className="p-2 rounded-full bg-white/5 hover:bg-white/15 transition-all"
+                        >
+                            <ArrowLeft size={22} className="text-purple-300" />
+                        </button>
+
+                        {/* Nút Về trang Home (Mới thêm) */}
+                        <button
+                            onClick={() => navigate("/")}
+                            title="Trang chủ"
+                            className="p-2 rounded-full bg-white/5 hover:bg-white/15 transition-all"
+                        >
+                            <Home size={22} className="text-violet-400" />
+                        </button>
+                    </div>
+
+                    {/* Tiêu đề ở giữa (Tuyệt đối) */}
                     <motion.h1
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: isScrolled ? 1 : 0, y: isScrolled ? 0 : -10 }}
-                        className="text-lg font-semibold tracking-wide truncate absolute left-1/2 -translate-x-1/2"
+                        className="text-lg font-semibold tracking-wide truncate absolute left-1/2 -translate-x-1/2 max-w-[150px] text-center"
                     >
                         {playlistDetails.name}
                     </motion.h1>
-                    <button onClick={openDeleteConfirmation} title="Xóa Playlist" className="p-2 rounded-full bg-white/5 hover:bg-red-500/20 transition-all"><Trash2 size={22} className="text-red-400" /></button>
+
+                    {/* Nút Xóa bên phải */}
+                    <button
+                        onClick={openDeleteConfirmation}
+                        title="Xóa Playlist"
+                        className="p-2 rounded-full bg-white/5 hover:bg-red-500/20 transition-all"
+                    >
+                        <Trash2 size={22} className="text-red-400" />
+                    </button>
                 </div>
             </div>
 
@@ -251,6 +280,7 @@ const PlaylistDetail = () => {
                                     <Music2 size={60} className="text-white/30" />
                                 </div>
                             )}
+                            
                         </div>
                         <h2 className="mt-4 text-3xl font-bold">{playlistDetails.name}</h2>
                         <p className="text-sm text-gray-300 mt-1">{songsInPlaylist.length} bài hát</p>
@@ -306,7 +336,6 @@ const PlaylistDetail = () => {
                     </div>
 
                     <div className="px-6 pb-6 space-y-3">
-                        {/* ✅ Bọc danh sách bài hát trong DndContext và SortableContext */}
                         <DndContext
                             collisionDetection={closestCenter}
                             onDragEnd={handleDragEnd}
@@ -315,18 +344,37 @@ const PlaylistDetail = () => {
                                 items={songsInPlaylist.map(song => song.path)}
                                 strategy={verticalListSortingStrategy}
                             >
-                                {songsInPlaylist.map((song, index) => (
-                                    <DraggableSongItem
-                                        key={song.path}
-                                        id={song.path}
-                                        song={song}
-                                        index={index} // ✅ Truyền index vào làm prop
-                                        isEditing={isEditing}
-                                        onPlay={() => playSong(song, songsInPlaylist, coverImageUrl)}
-                                    />
-                                ))}
+                                {songsInPlaylist.map((song, index) => {
+                                    const isActive = currentSong?.path === song.path;
+
+                                    return (
+                                        <DraggableSongItem
+                                            key={song.path}
+                                            id={song.path}
+                                            song={song}
+                                            index={index}
+                                            isEditing={isEditing}
+                                            isActive={isActive}
+                                            isPlaying={isActive && isPlaying}
+                                            onPlay={() => {
+                                                if (isActive) {
+                                                    playPause();
+                                                } else {
+                                                    playSong(song, songsInPlaylist, coverImageUrl);
+                                                }
+                                            }}
+                                        />
+                                    );
+                                })}
                             </SortableContext>
                         </DndContext>
+                        {songsInPlaylist.length === 0 && (
+                            <div className="text-center py-10 text-gray-400 opacity-60">
+                                <Music2 size={40} className="mx-auto mb-2" />
+                                <p>Playlist chưa có bài hát nào</p>
+                                <p className="text-xs">Nhấn "Thêm" để bắt đầu</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -11,9 +11,9 @@ const Setting = () => {
   const [isLoadingSize, setIsLoadingSize] = useState(false);
   const [isCdThemeEnabled, setIsCdThemeEnabled] = useState<boolean>(false);
 
- useEffect(() => {
+  useEffect(() => {
     // Tải cài đặt thư mục nhạc
-    fetchMusicFolder(); 
+    fetchMusicFolder();
 
     // Tải cài đặt chủ đề CD từ localStorage
     const savedThemeSetting = localStorage.getItem('cdThemeEnabled');
@@ -59,7 +59,7 @@ const Setting = () => {
       console.error("Lỗi chọn thư mục:", err);
     }
   };
-  
+
 
   const handleToggleCdTheme = () => {
     const newSetting = !isCdThemeEnabled;
@@ -73,10 +73,26 @@ const Setting = () => {
       <div className="flex items-center justify-between px-6 pt-8 pb-4">
         <button
           onClick={() => navigate("/")}
-          className="p-2 rounded-full bg-white/5 hover:bg-white/15 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_10px_rgba(168,85,247,0.4)]"
+          className="relative group p-3 rounded-full bg-white/5 
+             transition-all duration-300 ease-out
+             hover:bg-white/10 active:scale-95
+             focus:outline-none"
         >
-          <ArrowLeft size={22} className="text-purple-300" />
+          {/* Vòng sáng khi hover */}
+          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 blur-md 
+                  bg-gradient-to-r from-purple-500/40 via-pink-500/30 to-purple-700/30
+                  transition-all duration-500 animate-pulse pointer-events-none" />
+
+          {/* Viền kính nhẹ */}
+          <div className="absolute inset-0 rounded-full border border-white/10 group-hover:border-purple-400/40 transition-colors duration-300 pointer-events-none" />
+
+          {/* Icon */}
+          <ArrowLeft
+            size={22}
+            className="relative z-10 text-purple-300 group-hover:text-purple-200 transition-transform duration-300 group-hover:-translate-x-1"
+          />
         </button>
+
         <div className="text-center flex-1 -ml-6">
           <h1 className="text-lg font-semibold tracking-wide">Cài đặt ứng dụng</h1>
           <p className="text-xs text-gray-400 mt-1">Tùy chỉnh & cá nhân hóa trải nghiệm</p>
@@ -91,11 +107,10 @@ const Setting = () => {
 
         {/* ✅ BƯỚC 3: CẬP NHẬT GIAO DIỆN CARD ĐỂ HIỂN THỊ DUNG LƯỢNG */}
         <div
-          className={`rounded-2xl p-4 flex flex-col gap-3 backdrop-blur-md border transition-all duration-300 ${
-            musicFolderPath
+          className={`rounded-2xl p-4 flex flex-col gap-3 backdrop-blur-md border transition-all duration-300 ${musicFolderPath
               ? "bg-white/10 border-white/10 hover:bg-white/15 hover:border-purple-400/40"
               : "bg-white/5 border-dashed border-white/10 hover:bg-white/10"
-          }`}
+            }`}
         >
           {/* Phần thông tin và nút */}
           <div className="flex items-center justify-between">
@@ -121,7 +136,7 @@ const Setting = () => {
               {musicFolderPath ? "Thay đổi" : "Chọn"}
             </button>
           </div>
-          
+
           {/* Phần hiển thị dung lượng (chỉ hiện khi có đường dẫn) */}
           {musicFolderPath && (
             <>
@@ -140,83 +155,81 @@ const Setting = () => {
 
 
         <div className="rounded-2xl p-4 flex items-center justify-between bg-white/10 border border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400">
-                <Disc3 size={22} />
-              </div>
-              <div className="flex flex-col">
-                 <span className="text-sm font-medium text-white/90">Giao diện trang phát nhạc</span>
-                 <span className="text-xs text-gray-400">Bật hiệu xuất hiện màu chủ đạo cho trang phát nhạc</span>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400">
+              <Disc3 size={22} />
             </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-white/90">Giao diện trang phát nhạc</span>
+              <span className="text-xs text-gray-400">Bật hiệu xuất hiện màu chủ đạo cho trang phát nhạc</span>
+            </div>
+          </div>
 
-            {/* Công tắc (Toggle Switch) */}
-            <button
-                onClick={handleToggleCdTheme}
-                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 focus:outline-none shadow-inner ${
-                    isCdThemeEnabled ? 'bg-purple-600' : 'bg-gray-600'
+          {/* Công tắc (Toggle Switch) */}
+          <button
+            onClick={handleToggleCdTheme}
+            className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 focus:outline-none shadow-inner ${isCdThemeEnabled ? 'bg-purple-600' : 'bg-gray-600'
+              }`}
+          >
+            <span
+              className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 ${isCdThemeEnabled ? 'translate-x-6' : 'translate-x-1'
                 }`}
-            >
-                <span
-                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 ${
-                        isCdThemeEnabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                />
-            </button>
+            />
+          </button>
         </div>
 
         <div className="rounded-2xl p-4 flex flex-col gap-3 bg-white/10 border border-white/10">
-            {/* Tiêu đề Card */}
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400">
-                <Keyboard size={22} />
-              </div>
-              <div className="flex flex-col">
-                 <span className="text-sm font-medium text-white/90">Phím tắt</span>
-                 <span className="text-xs text-gray-400">Điều khiển nhanh ứng dụng</span>
+          {/* Tiêu đề Card */}
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400">
+              <Keyboard size={22} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-white/90">Phím tắt</span>
+              <span className="text-xs text-gray-400">Điều khiển nhanh ứng dụng</span>
+            </div>
+          </div>
+
+          {/* Dòng kẻ phân cách */}
+          <div className="w-full h-px bg-white/15 my-1"></div>
+
+          {/* Danh sách các phím tắt */}
+          <div className="flex flex-col space-y-2 text-sm px-1">
+            {/* Mỗi dòng là một phím tắt */}
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Phát / Tạm dừng</span>
+              <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">Space</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Tua tới / Tua lui 10s</span>
+              <div className="flex gap-1">
+                <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">←</kbd>
+                <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">→</kbd>
               </div>
             </div>
-
-            {/* Dòng kẻ phân cách */}
-            <div className="w-full h-px bg-white/15 my-1"></div>
-
-            {/* Danh sách các phím tắt */}
-            <div className="flex flex-col space-y-2 text-sm px-1">
-                {/* Mỗi dòng là một phím tắt */}
-                <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Phát / Tạm dừng</span>
-                    <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">Space</kbd>
-                </div>
-                 <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Tua tới / Tua lui 10s</span>
-                    <div className="flex gap-1">
-                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">←</kbd>
-                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">→</kbd>
-                    </div>
-                </div>
-                 <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Tăng / Giảm âm lượng</span>
-                     <div className="flex gap-1">
-                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">↑</kbd>
-                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">↓</kbd>
-                    </div>
-                </div>
-                 <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Bài trước / Bài kế tiếp</span>
-                    <div className="flex gap-1">
-                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">A</kbd>
-                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">D</kbd>
-                    </div>
-                </div>
-                 <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Lặp lại</span>
-                    <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">Z</kbd>
-                </div>
-                 <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Tắt tiếng</span>
-                    <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">M</kbd>
-                </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Tăng / Giảm âm lượng</span>
+              <div className="flex gap-1">
+                <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">↑</kbd>
+                <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">↓</kbd>
+              </div>
             </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Bài trước / Bài kế tiếp</span>
+              <div className="flex gap-1">
+                <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">A</kbd>
+                <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">D</kbd>
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Lặp lại</span>
+              <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">Z</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Tắt tiếng</span>
+              <kbd className="px-2 py-1 text-xs font-semibold text-gray-200 bg-gray-600 border border-gray-500 rounded-md">M</kbd>
+            </div>
+          </div>
         </div>
 
         <div className="flex-1" />

@@ -12,6 +12,7 @@ interface AudioContextType {
   duration: number;
   volume: number;
   isLooping: boolean;
+   activePlaylist: Song[] | null; 
   activePlaylistCover?: string | null;
   playSong: (song: Song, contextPlaylist?: Song[], playlistCover?: string | null) => void;
   playPause: () => void;
@@ -66,7 +67,7 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
 
   // Khởi tạo và dọn dẹp plugin media
   useEffect(() => {
-    mediaControls.initialize('com.dell.i-music', 'iMusic').catch(console.error);
+    mediaControls.initialize('com.vyphandev.i-music', 'iMusic').catch(console.error);
     // Dọn dẹp khi component bị unmount
     return () => {
       mediaControls.clearNowPlaying().catch(console.error);
@@ -224,7 +225,7 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
   const onLoadedMetadata = () => audioRef.current && setDuration(audioRef.current.duration);
 
   const value: AudioContextType = {
-    playlist: fullLibrary, activePlaylistCover, currentSong, isPlaying, currentTime, duration, volume, isLooping,
+    playlist: fullLibrary, activePlaylistCover, currentSong, isPlaying, currentTime, duration, volume, isLooping, activePlaylist: activePlaylist,
     playSong, playPause, seek, changeVolume, nextSong, previousSong, toggleLoop,
     skipBack10,
     skipForward10,

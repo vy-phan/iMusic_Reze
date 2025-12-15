@@ -1,66 +1,94 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Play } from 'lucide-react';
+import { GripVertical, Pause, Play } from 'lucide-react';
 import { Song } from '..';
 
 interface DraggableSongItemProps {
-    song: Song;
-    id: string;
-    index: number;
-    isEditing: boolean;
-    onPlay: () => void;
+  song: Song;
+  id: string;
+  index: number;
+  isActive: boolean;
+  isPlaying: boolean;
+  isEditing: boolean;
+  onPlay: () => void;
 }
 
-export const DraggableSongItem = ({ song, id, index, isEditing, onPlay }: DraggableSongItemProps) => {
-    // ✅ Hook chính của dnd-kit cho danh sách sắp xếp
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: id });
+export const DraggableSongItem = ({
+  song,
+  id,
+  index,
+  isActive,
+  isEditing,
+  isPlaying,
+  onPlay,
+}: DraggableSongItemProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
-    // ✅ Style để áp dụng hiệu ứng kéo và chuyển động
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-        // zIndex cao hơn khi kéo để nó nổi lên trên các item khác
-        zIndex: isDragging ? 10 : 'auto',
-    };
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 'auto',
+  };
 
-    return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            // `attributes` chứa các thuộc tính ARIA cần thiết
-            {...attributes}
-            className="flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors rounded-xl p-3 relative"
-        >
-            <div className="flex items-center gap-4">
-                {isEditing ? (
-                    // ✅ `listeners` chứa các sự kiện onMouseDown, onKeyDown... để bắt đầu kéo
-                    <div {...listeners} className="cursor-grab text-gray-500 touch-none">
-                        <GripVertical size={20} />
-                    </div>
-                ) : (
-                    <span className="text-sm text-gray-400 w-6 text-center">{index + 1}</span>
-                )}
-                <div>
-                    <h3 className="text-base font-medium text-white/90 truncate max-w-[200px]">{song.title}</h3>
-                    <p className="text-sm text-gray-400">{song.artist}</p>
-                </div>
-            </div>
-            <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-400">{song.duration}</span>
-                {!isEditing && (
-                    <button onClick={onPlay} className="p-2 rounded-lg hover:bg-purple-600/40 transition-colors">
-                        <Play size={16} />
-                    </button>
-                )}
-            </div>
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      onDragStart={(e) => e.preventDefault()}
+      onMouseDown={(e) => e.preventDefault()}
+      onContextMenu={(e) => e.preventDefault()}
+      className={`flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors rounded-xl p-3 relative border select-none ${
+        isActive ? 'border-purple-500 bg-purple-500/10' : 'border-transparent'
+      }`}
+    >
+      <div className="flex items-center gap-4">
+        {isEditing ? (
+          <div
+            {...listeners}
+            className="cursor-grab text-gray-500 active:cursor-grabbing touch-none select-none"
+          >
+            <GripVertical size={20} />
+          </div>
+        ) : (
+          <span
+            className={`text-sm w-6 text-center transition-colors ${
+              isActive ? 'text-purple-400 font-bold' : 'text-gray-400'
+            }`}
+          >
+            {index + 1}
+          </span>
+        )}
+
+        <div>
+          <h3
+            className={`text-base font-medium truncate max-w-[200px] transition-colors ${
+              isActive ? 'text-purple-300' : 'text-white/90'
+            }`}
+          >
+            {song.title}
+          </h3>
+          <p className="text-sm text-gray-400">{song.artist}</p>
         </div>
-    );
+      </div>
+
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-gray-400">{song.duration}</span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // ✅ Không ảnh hưởng đến drag
+            onPlay();
+          }}
+          className={`p-2 rounded-lg transition-colors ${
+            isPlaying
+              ? 'bg-pink-500/80 hover:bg-pink-600 text-white'
+              : 'bg-purple-500/80 hover:bg-purple-600/40'
+          }`}
+        >
+          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+        </button>
+      </div>
+    </div>
+  );
 };
