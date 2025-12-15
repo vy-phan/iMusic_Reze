@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "i-music",
-  "version": "1.0.0",
-  "identifier": "com.dell.i-music",
+  "version": "1.0.1",
+  "identifier": "com.vyphandev.i-music",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",

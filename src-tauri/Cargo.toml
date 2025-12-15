@@ -1,6 +1,6 @@
 [package]
 name = "i-music"
-version = "1.0.0"
+version = "1.0.1"
 description = "iMusic là một trình phát nhạc cá nhân, gọn nhẹ và mạnh mẽ."
 authors = ["Vy Phan Dev"]
 edition = "2021"

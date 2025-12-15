@@ -441,6 +441,57 @@ fn save_music_file(
     Ok(new_song)
 }
 
+#[tauri::command]
+fn delete_song(app: AppHandle, song_path_to_delete: String) -> Result<(), String> {
+    println!("🔥 Bắt đầu quá trình xóa bài hát: {}", &song_path_to_delete);
+
+    // --- BƯỚC 1: XÓA BÀI HÁT KHỎI THƯ VIỆN CHÍNH (library.json) ---
+    let library_store = app.store("library.json").map_err(|e| e.to_string())?;
+    let mut all_songs: Vec<Song> = library_store
+        .get("songs")
+        .and_then(|v| serde_json::from_value(v.clone()).ok())
+        .unwrap_or_default();
+    
+    // Giữ lại tất cả các bài hát KHÔNG có đường dẫn trùng với bài cần xóa
+    all_songs.retain(|song| song.path != song_path_to_delete);
+    
+    // Lưu lại thư viện đã cập nhật
+    library_store.set("songs", json!(all_songs));
+    library_store.save().map_err(|e| e.to_string())?;
+    println!("✅ Đã xóa bài hát khỏi library.json.");
+
+
+    // --- BƯỚC 2: XÓA BÀI HÁT KHỎI TẤT CẢ CÁC PLAYLIST (playlists.json) ---
+    let playlists_store = app.store("playlists.json").map_err(|e| e.to_string())?;
+    let mut all_playlists: Vec<Playlist> = playlists_store
+        .get("playlists")
+        .and_then(|v| serde_json::from_value(v.clone()).ok())
+        .unwrap_or_default();
+
+    // Lặp qua từng playlist và xóa bài hát nếu có
+    for playlist in all_playlists.iter_mut() {
+        playlist.songs.retain(|item| item.song_path != song_path_to_delete);
+    }
+
+    // Lưu lại toàn bộ danh sách playlists đã được cập nhật
+    playlists_store.set("playlists", json!(all_playlists));
+    playlists_store.save().map_err(|e| e.to_string())?;
+    println!("✅ Đã xóa bài hát khỏi tất cả các playlists.json.");
+
+
+    // --- BƯỚC 3: XÓA FILE VẬT LÝ (SAU KHI ĐÃ CẬP NHẬT DỮ LIỆU THÀNH CÔNG) ---
+    let file_path = PathBuf::from(&song_path_to_delete);
+    if file_path.exists() {
+        fs::remove_file(&file_path)
+            .map_err(|e| format!("Lỗi khi xóa file vật lý: {}", e))?;
+        println!("🗑️ Đã xóa file vật lý thành công: {:?}", file_path);
+    } else {
+        println!("⚠️ Không tìm thấy file vật lý để xóa (có thể đã được xóa trước đó): {:?}", file_path);
+    }
+
+    Ok(())
+}
+
 /// Lấy độ dài bài hát và format thành mm:ss
 fn get_audio_duration(path: &PathBuf) -> Result<String, symphonia::core::errors::Error> {
     use std::fs::File;
@@ -495,7 +546,8 @@ pub fn run() {
             load_playlists,
             delete_playlist,
             update_playlist_songs,
-            add_songs_to_playlist
+            add_songs_to_playlist,
+            delete_song,
         ])
         .run(tauri::generate_context!())
         .expect("❌ Error while running Tauri application");
